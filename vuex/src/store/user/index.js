@@ -7,16 +7,19 @@ export default {
 	},
 	actions: {
 		getUser( {commit, dispatch, rootState}, payload ) {
-			if(!rootState.users[payload]){
+			if(!rootState.users[payload.id] && payload.id >0){
 	  			dispatch('wait/start', 'fetching user', { root: true });
 		  		Vue.axios.get('https://reqres.in/api/users/'+payload.id).then(({data}) => {
 					commit('SET_USER', data.data)
-		  			commit('SET_USERS', Object.assign({}, rootState.users, data.data), { root: true })
-
-	  				dispatch('wait/end', 'fetching user', { root: true });
+	  				dispatch('wait/end', 'fetching user', { root: true })
+	  				
+	  				let users = rootState.users.slice(0);
+	  				users.splice(data.data.id, 1, data.data)
+	  				commit('UPDATE_PER_PAGE', Number(rootState.perpage)+1, { root: true })
+		  			commit('SET_USERS', users, { root: true })
 				});
 		  	}else{
-		  		commit('SET_USER', rootState.users[payload])
+		  		commit('SET_USER', rootState.users[payload.id])
 		  	}
 	  	}
 	},

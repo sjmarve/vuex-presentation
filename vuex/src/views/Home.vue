@@ -5,6 +5,13 @@
         Fetching Data...
       </template>
 		  <h2>User List <input type="seach" v-model="search" placeholder="search"></h2>
+      <p>
+        <label>
+          0 upto 12 records available
+          <input type="text" :value="$store.state.perpage" @input="updateLocalPerPage" placeholder="Number of records">
+        </label>
+        <button type="button" @click="updateNumberOfRecords">Load Records</button>
+      </p>
 	  	<table border="1" width="100%">
 	  		<thead>
 	  			<tr>
@@ -32,6 +39,11 @@ import {mapGetters} from 'vuex'
 
 export default {
   name: 'home',
+  data() {
+    return {
+      localPerPage: this.$store.state.perpage
+    }
+  },
   mounted() {
   	this.$store.dispatch('getUsers')
   },
@@ -47,6 +59,16 @@ export default {
   			this.$store.dispatch('updateSearch', value)
   		}
   	}
+  },
+  methods:{
+    updateNumberOfRecords(){
+      this.$store.dispatch('perPageChange', this.localPerPage).then(() =>{
+        this.$store.dispatch('getUsers')
+      });
+    },
+    updateLocalPerPage(e){
+      this.localPerPage = e.data ? e.data: this.$store.state.perpage
+    }
   }
 }
 </script>
